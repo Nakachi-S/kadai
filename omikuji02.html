@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/sample.css">
+    <title>おみくじ</title>
+</head>
+
+<body>
+    <header>
+        <h1>おみくじ</h1>
+    </header>
+
+    <main>
+        <ul>
+            <li id="pull">おみくじを引く</li>
+        </ul>
+        <p id="echo">結果は？</p>
+    </main>
+
+    <footer>フッター</footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            //クリック処理
+            $('#pull').on('click', function () {
+                let tmp = Math.floor(Math.random() * 5);
+                let arr = ["大吉", "中吉", "小吉", "凶", "大凶"];
+
+                if (tmp == 0) {
+                    $('#echo').html('大吉');
+                }
+
+                if (tmp == 1) {
+                    $('#echo').html('中吉');
+                }
+
+                if (tmp == 2) {
+                    $('#echo').html('小吉');
+                }
+
+                if (tmp == 3) {
+                    $('#echo').html('凶');
+                }
+
+                if (tmp == 4) {
+                    $('#echo').html('大凶');
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
