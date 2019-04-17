@@ -3,6 +3,7 @@ phina.globalize();
 
 var ASSETS = {
     image: {
+        title: "img/title.jpg",
         bg1: "img/bg1.jpg",
         hito1: "img/hito1.png",
         enemy1: "img/enemy1.png",
@@ -17,6 +18,7 @@ var FONT_SIZE = 25;
 var SCREEN_WIDTH = 800;              // スクリーン幅
 var SCREEN_HEIGHT = 600;
 
+// 最初のセリフ
 const MAINNTEXTS = [
     "少年は激怒した。",
     "必ず、かの邪智暴虐の主人公らを\n除かなければならぬと決意した。",
@@ -30,11 +32,9 @@ const MAINNTEXTS = [
     "【アソパソマソ】\nぼく、アソパソマソ！\n\n元気１００倍！アソパソマソ！！",
     "アソパソマソが勝負を仕掛けてきた！！！",
     "少年はどの手を出す？？\n（上の画像を選択してね）",
-    "text",
-    "test",
-    "text",
-    "test",
 ];
+//
+
 
 //============================================
 // タイトルシーン
@@ -45,8 +45,15 @@ phina.define('TitleScene', {
     init: function (options) {
         this.superInit(options);
 
-        this.backgroundColor = '#444';
-        var label1 = Label('いらすとやの野望').addChildTo(this);
+        // this.backgroundColor = '#444';
+        this.bg = Sprite("title").addChildTo(this);
+        this.bg.origin.set(0, 0);
+
+        var label1 = Label({
+            text: 'いらすとやの野望',
+            fill: 'white',
+            fontSize: 64,
+        }).addChildTo(this);
         label1.x = this.gridX.center();
         label1.y = this.gridY.center() / 3;
 
@@ -89,7 +96,6 @@ phina.define('MainScene', {
         this.labelRect.texts = MAINNTEXTS;
         this.labelRect.textIndex = 0;
         this.labelRect.charIndex = 0;
-        this.labelRect.setInteractive(true);
 
         // ジャンケン
         this.guPosi = DisplayElement().addChildTo(this);
@@ -97,24 +103,44 @@ phina.define('MainScene', {
         this.paPosi = DisplayElement().addChildTo(this);
 
         this.setPhase();
+
+        //ラベルエリアがクリックされた場合
+        this.labelRect.onclick = function () {
+            if (this.textAll) {
+                this.nextText();
+            } else {
+                this.showAllText();
+            }
+        }
+
+        // this.labelRect.update = function (app) {
+        //     if (app.pointer.getPointingStart() || app.keyboard.getKeyDown("enter")) {
+        //         // if (this.labelRect.onpointstart) {
+        //         if (this.textAll) {//テキスト全部表示済み
+        //             this.nextText();
+        //             // 次の背景に切替
+        //             this.setPhase();
+        //         } else {
+        //             this.showAllText();   //テキスト全部表示してないなら、全表示
+        //         }
+        //     } else {    //クリックされてないなら、文字送り
+        //         this.addChar();
+        //     }
+
+        //     if (this.textAll) {
+        //         this.nextTriangle.show();
+        //     } else {
+        //         this.nextTriangle.hide();
+        //     }
+        // }
     },
 
-    // 更新
+    //更新
     update: function (app) {
         //クリックかEnterキーの入力があった場合
-        if (app.pointer.getPointingStart() || app.keyboard.getKeyDown("enter")) {
-            // if (this.labelRect.onpointstart) {
-            if (this.labelRect.textAll) {//テキスト全部表示済み
-                console.log("ok1");
-                this.labelRect.nextText();
-                // 次の背景に切替
-                this.setPhase();
-            } else {
-                this.labelRect.showAllText();
-            }
-        } else {
-            this.labelRect.addChar();
-            console.log("ok2");
+        this.labelRect.addChar();
+        if (this.labelRect.textAll) {
+            this.setPhase();
         }
 
         if (this.labelRect.textAll) {
@@ -123,8 +149,33 @@ phina.define('MainScene', {
             this.labelRect.nextTriangle.hide();
         }
     },
+    // 更新
+    // update: function (app) {
+    //     //クリックかEnterキーの入力があった場合
+    //     if (app.pointer.getPointingStart() || app.keyboard.getKeyDown("enter")) {
+    //         // if (this.labelRect.onpointstart) {
+    //         if (this.labelRect.textAll) {//テキスト全部表示済み
+    //             console.log("ok1");
+    //             this.labelRect.nextText();
+    //             // 次の背景に切替
+    //             this.setPhase();
+    //         } else {
+    //             this.labelRect.showAllText();
+    //         }
+    //     } else {
+    //         this.labelRect.addChar();
+    //         console.log("ok2");
+    //     }
+
+    //     if (this.labelRect.textAll) {
+    //         this.labelRect.nextTriangle.show();
+    //     } else {
+    //         this.labelRect.nextTriangle.hide();
+    //     }
+    // },
 
     setPhase: function () {
+        console.log(this.labelRect.textIndex);
         switch (this.labelRect.textIndex) {
             case 4:
                 this.bg1 = this.setBackImg("bg1");
@@ -132,20 +183,24 @@ phina.define('MainScene', {
                 this.bg1.tweener.clear().to({ alpha: 1 }, 200).play();
                 break;
             //let hito1 = Sprite("hito1").appChldTo(this).setPosition(this.gridX.center(), this.gridY.center());
+
             case 8:
                 this.enemy1 = this.setEnemyImg("enemy1");
                 this.enemy1.scaleX -= 0.65;
                 this.enemy1.scaleY -= 0.65;
                 this.enemy1.alpha = 0;
                 this.enemy1.tweener.clear().to({ alpha: 1 }, 200).play();
-                this.setInteractive(false);
                 break;
 
             case 10:
                 this.gu = this.setGu("gu");
                 this.tyo = this.setTyo("tyo");
                 this.pa = this.setPa("pa");
-
+                //タッチイベントの登録
+                this.gu.setInteractive(true); this.tyo.setInteractive(true); this.pa.setInteractive(true);
+                this.gu.onclick = function () {
+                    //ここでthis.labelRect.textsの中身を変更したいができない
+                }
 
                 break;
         }
@@ -163,7 +218,7 @@ phina.define('MainScene', {
             .setPosition(this.gridX.center() * 1 / 2, this.gridY.center());
         return img;
     },
-    // ジャンケン
+    // ジャンケン画像セット
     setGu: function (imgName) {
         let img = Sprite(imgName).addChildTo(this.guPosi)
             .setPosition(this.gridX.center() - 30, this.gridY.center() / 4);
@@ -251,6 +306,7 @@ phina.define("LabelRect", {
             fill: "#eee"
         });
         this.alpha = 0.8;
+        this.setInteractive(true);
 
         // テキスト表示用LabelAreaクラス
         this.labelArea = LabelArea({
@@ -259,6 +315,7 @@ phina.define("LabelRect", {
             height: 240,
             fontSize: FONT_SIZE
         }).addChildTo(this);
+        this.labelArea.setInteractive(true);
 
         this.texts = [];
         this.textIndex = 0;
@@ -273,15 +330,16 @@ phina.define("LabelRect", {
             .setPosition(290, 60);
         this.nextTriangle.rotation = 180;
         this.nextTriangle.hide();
-
     },
     // 更新
-    // update: function () {
+    // onclick: function () {
+
+    // },
+    // update: function (app) {
     //     //クリックかEnterキーの入力があった場合
     //     //if (app.pointer.getPointingStart() || app.keyboard.getKeyDown("enter")) {
     //     if (this.onpointstart || this.labelArea.onclick) {
     //         if (this.textAll) {//テキスト全部表示済み
-    //             console.log("ok1");
     //             this.nextText();
     //             // 次の背景に切替
     //             this.setPhase();
@@ -290,7 +348,6 @@ phina.define("LabelRect", {
     //         }
     //     } else {
     //         this.addChar();
-    //         console.log("ok2");
     //     }
 
     //     if (this.textAll) {
